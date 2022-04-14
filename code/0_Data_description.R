@@ -7,6 +7,7 @@
 library(xlsx)
 library(dplyr)
 library(tidyr)
+library(ggplot2)
 
 # The business datasets are all separate, these have to be called in separately
 load_bpe <- function(f_loc){
@@ -38,20 +39,16 @@ load_bpe <- function(f_loc){
 list_of_files <- list.files(paste0(getwd(), "/data"))
 
 # Loading the RIIO dataset
-riio_data <- read.xlsx(paste0(getwd(), "/data/",list_of_files[grepl("riio", list_of_files)]), sheetName = "Dataset")
+riio_data <- read.xlsx(paste0(getwd(), "/data/",list_of_files[grepl("RIIO", list_of_files)]), sheetName = "Dataset")
 
 # Choosing the three data series and making the dataset tidy
-riio_data_clean <- riio_data %>% filter(Selection %in% c("Interruptions", "CI performance", "CML performance")) %>%
+riio_data_clean <- riio_data %>% filter(Selection %in% c("Interruptions", "CML performance")) %>%
             # Interruption satisfaction was not measured in 2014/15
             filter(Year != "2014/15") %>%
             # Dropping unnecessary columns
             select(-Schedule, -Section, -Category, -Units, -Industry.Average, -xllookup) %>% select(1:16) %>%
             # Pivoting longer
             pivot_longer(cols = 3:16, names_to = "DNO")
-
-# A (hopefully) temporary adjustment, as there are two sets of rows labelled 'CML performance' - the second
-# set is in fact the planned performance, not the total
-riio_data_clean <- riio_data_clean[-seq(2*14*length(unique(riio_data_clean$Year))+1,3*14*length(unique(riio_data_clean$Year))),]
 
 # Loading the Business metrics dataset. The function already cleans these
 bpe_data <- lapply(list_of_files[grepl("BPE", list_of_files)], load_bpe)
