@@ -7,6 +7,7 @@
 library(xlsx)
 library(dplyr)
 library(tidyr)
+library(tseries)
 library(ggplot2)
 
 # # The business datasets are all separate, these have to be called in separately
@@ -105,6 +106,7 @@ ggsave("graphs/scatter_cml_sat.png")
 riio_data_summary <- data.frame(mean_cml = mean(riio_data_clean$`CML performance`),
                                 median_cml = median(riio_data_clean$`CML performance`),
                                 std_error_cml = sqrt(var(riio_data_clean$`CML performance`)),
+                                jb_p_cml = jarque.bera.test(riio_data_clean$`CML performance`)$p.value,
                                 mean_sat = mean(riio_data_clean$Interruptions),
                                 median_sat = median(riio_data_clean$Interruptions),
                                 std_error_sat = sqrt(var(riio_data_clean$Interruptions)))

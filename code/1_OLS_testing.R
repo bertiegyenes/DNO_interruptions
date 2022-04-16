@@ -7,6 +7,9 @@ library(xlsx)
 library(dplyr)
 library(tidyr)
 library(broom)
+library(car)
+library(tseries)
+library(lmtest)
 library(ggplot2)
 
 ######## Loading in ########
@@ -28,8 +31,8 @@ riio_data_clean <- riio_data %>% filter(Selection %in% c("Interruptions", "CML p
   mutate(value = as.numeric(value)) %>%
   # Pivot wider to ensure each row is a single observation (i.e. one year and one DNO)
   pivot_wider(names_from = Selection, values_from = value) %>%
-  # Changing the CML variable to its reciprocal and adding a numerical year variable
-  mutate(oneover = 1/`CML performance`, year_num = as.numeric(substr(Year,1,4)))
+  # Adding a numerical year variable
+  mutate(year_num = as.numeric(substr(Year,1,4)))
 
 # This dataset is saved
 write.csv(riio_data_clean,file = "code_data/riio_data_clear.csv")
@@ -38,11 +41,10 @@ write.csv(riio_data_clean,file = "code_data/riio_data_clear.csv")
 # Two models are estimated
 
 # First, one value for all DNOs
-model_all_dno <- lm(riio_data_clean$Interruptions ~ riio_data_clean$oneover + riio_data_clean$year_num)
+model_all_dno <- lm(Interruptions ~ `CML performance` + year_num, data = riio_data_clean)
 
 # Second, including dummy variables for DNOs
-model_each_dno <- lm(riio_data_clean$Interruptions ~ riio_data_clean$oneover + riio_data_clean$year_num +
-                       riio_data_clean$DNO)
+model_each_dno <- lm(Interruptions ~ `CML performance` * DNO + year_num, data = riio_data_clean)
 
 # Constructing a table with the key features of the overall regression
 ols_features <- data.frame(modelname = c("Model 1", "Model 2"),
@@ -57,11 +59,22 @@ ols_features <- data.frame(modelname = c("Model 1", "Model 2"),
                                                   pf(summary(model_each_dno)$fstatistic[1],
                                                      summary(model_each_dno)$fstatistic[2],
                                                      summary(model_each_dno)$fstatistic[3], lower.tail = FALSE)),
-                           aic_values = c(glance(model_all_dno)$AIC,glance(model_each_dno)$AIC)) %>% t()
+                           aic_values = c(glance(model_all_dno)$AIC,glance(model_each_dno)$AIC),
+                           f_comparison = c(anova(model_all_dno,model_each_dno)$F[2],
+                                            anova(model_all_dno,model_each_dno)$`Pr(>F)`[2])) %>% t()
 write.csv(ols_features, "code_data/ols_features.csv")
 
 ######## Residuals ##########
+# Testing the assumptions of the residuals
 
+# Constructing a table with the key features of the overall regression
+residuals_features <- data.frame(modelname = c("Model 1", "Model 2"),
+                           bp_p = c(bptest(model_all_dno)$p.value[[1]],bptest(model_each_dno)$p.value[[1]]),
+                           dw_stat = c(durbinWatsonTest(model_all_dno)$dw,durbinWatsonTest(model_each_dno)$dw),
+                           dw_p = c(durbinWatsonTest(model_all_dno)$p,durbinWatsonTest(model_each_dno)$p),
+                           reset_p = c(reset(model_all_dno, power = 2:3)$p.value,reset(model_each_dno, power = 2:3)$p.value),
+                           jb_p = c(jarque.bera.test(model_all_dno$residuals)$p.value,
+                                    jarque.bera.test(model_each_dno$residuals)$p.value))
 
 
 
