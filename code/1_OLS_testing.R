@@ -6,6 +6,7 @@
 library(xlsx)
 library(dplyr)
 library(tidyr)
+library(broom)
 library(ggplot2)
 
 ######## Loading in ########
@@ -43,9 +44,23 @@ model_all_dno <- lm(riio_data_clean$Interruptions ~ riio_data_clean$oneover + ri
 model_each_dno <- lm(riio_data_clean$Interruptions ~ riio_data_clean$oneover + riio_data_clean$year_num +
                        riio_data_clean$DNO)
 
+# Constructing a table with the key features of the overall regression
+ols_features <- data.frame(modelname = c("Model 1", "Model 2"),
+                           adjusted_r_squared = c(summary(model_all_dno)$adj.r.squared,summary(model_each_dno)$adj.r.squared),
+                           residual_st_error = c(summary(model_all_dno)$sigma,summary(model_each_dno)$sigma),
+                           f_statistic = c(summary(model_all_dno)$fstatistic[1],summary(model_each_dno)$fstatistic[1]),
+                           f_statistic_df1 = c(summary(model_all_dno)$fstatistic[2],summary(model_each_dno)$fstatistic[2]),
+                           f_statistic_df2 = c(summary(model_all_dno)$fstatistic[3],summary(model_each_dno)$fstatistic[3]),
+                           f_statistic_pvalue = c(pf(summary(model_all_dno)$fstatistic[1],
+                                                     summary(model_all_dno)$fstatistic[2],
+                                                     summary(model_all_dno)$fstatistic[3], lower.tail = FALSE),
+                                                  pf(summary(model_each_dno)$fstatistic[1],
+                                                     summary(model_each_dno)$fstatistic[2],
+                                                     summary(model_each_dno)$fstatistic[3], lower.tail = FALSE)),
+                           aic_values = c(glance(model_all_dno)$AIC,glance(model_each_dno)$AIC)) %>% t()
+write.csv(ols_features, "code_data/ols_features.csv")
 
 ######## Residuals ##########
-
 
 
 
