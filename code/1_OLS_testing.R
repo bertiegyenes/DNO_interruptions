@@ -74,7 +74,13 @@ residuals_features <- data.frame(modelname = c("Model 1", "Model 2"),
                            dw_p = c(durbinWatsonTest(model_all_dno)$p,durbinWatsonTest(model_each_dno)$p),
                            reset_p = c(reset(model_all_dno, power = 2:3)$p.value,reset(model_each_dno, power = 2:3)$p.value),
                            jb_p = c(jarque.bera.test(model_all_dno$residuals)$p.value,
-                                    jarque.bera.test(model_each_dno$residuals)$p.value))
+                                    jarque.bera.test(model_each_dno$residuals)$p.value)) %>% t()
 write.csv(residuals_features, "code_data/residuals_features.csv")
+
+######### Coefficients ##########
+# By this point, it is clear that the second model has performed much better, so only coefficients for this are taken.
+
+model_coefs_each <- summary(model_each_dno)$coefficients
+write.csv(model_coefs_each, "code_data/model_coefs_each.csv")
 
 
