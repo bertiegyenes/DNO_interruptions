@@ -75,6 +75,6 @@ residuals_features <- data.frame(modelname = c("Model 1", "Model 2"),
                            reset_p = c(reset(model_all_dno, power = 2:3)$p.value,reset(model_each_dno, power = 2:3)$p.value),
                            jb_p = c(jarque.bera.test(model_all_dno$residuals)$p.value,
                                     jarque.bera.test(model_each_dno$residuals)$p.value))
-
+write.csv(residuals_features, "code_data/residuals_features.csv")
 
 
