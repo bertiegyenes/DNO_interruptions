@@ -1,5 +1,9 @@
 # Data files
 /data
+/code_data
+
+# Graphs
+/graphs
 
 # History files
 .Rhistory
