@@ -34,4 +34,19 @@ riio_data_clean <- riio_data %>% filter(Selection %in% c("Interruptions", "CML p
 write.csv(riio_data_clean,file = "code_data/riio_data_clear.csv")
 
 ######## OLS ###############
+# Two models are estimated
+
+# First, one value for all DNOs
+model_all_dno <- lm(riio_data_clean$Interruptions ~ riio_data_clean$oneover + riio_data_clean$year_num)
+
+# Second, including dummy variables for DNOs
+model_each_dno <- lm(riio_data_clean$Interruptions ~ riio_data_clean$oneover + riio_data_clean$year_num +
+                       riio_data_clean$DNO)
+
+
+######## Residuals ##########
+
+
+
+
 
