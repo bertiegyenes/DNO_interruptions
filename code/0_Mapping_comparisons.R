@@ -1,5 +1,6 @@
 ######### Mapping characterisation #########
 # The two boundaries datasets are compared in this script.
+# This script is not used in the actual project in the end.
 
 ######### Libraries and functions ##########
 library(devtools)

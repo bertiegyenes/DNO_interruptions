@@ -36,6 +36,7 @@ riio_data_clean <- riio_data %>% filter(Selection %in% c("Interruptions", "CML p
 
 # This dataset is saved
 write.csv(riio_data_clean,file = "code_data/riio_data_clear.csv")
+# riio_data_clean <- read.csv(file = "code_data/riio_data_clear.csv")
 
 ######## OLS ###############
 # Two models are estimated

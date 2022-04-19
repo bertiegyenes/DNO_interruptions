@@ -10,6 +10,8 @@ library(tidyr)
 library(tseries)
 library(ggplot2)
 
+###
+# This component was cut as it is not a priority to explore as a next step.
 # # The business datasets are all separate, these have to be called in separately
 # load_bpe <- function(f_loc){
 #   df_load <- try(read.xlsx(paste0(getwd(), "/data/",f_loc), sheetName = "Table 8",
@@ -34,9 +36,12 @@ library(ggplot2)
 #     gc()
 #     return(df_load)
 # }
+###
 
 ######## Loading in ########
 # All files in the data folder
+# The raw data can be found here: https://www.ofgem.gov.uk/publications/riio-1-electricity-distribution-annual-report-2020-21
+# This should be saved in a folder titled 'data'.
 list_of_files <- list.files(paste0(getwd(), "/data"))
 
 # Loading the RIIO dataset
@@ -55,10 +60,15 @@ riio_data_clean <- riio_data %>% filter(Selection %in% c("Interruptions", "CML p
             # Pivot wider to ensure each row is a single observation (i.e. one year and one DNO)
             pivot_wider(names_from = Selection, values_from = value)
 
+####
+# This component was cut as it is not a priority to explore as a next step.
 # # Loading the Business metrics dataset. The function already cleans these
 # bpe_data <- lapply(list_of_files[grepl("BPE", list_of_files)], load_bpe)
 # bpe_data_clean <- bind_rows(bpe_data)
+####
 
+# Load in if using the provided file.
+# riio_data_clean <- read.csv(file = "code_data/riio_data_clear.csv")
 
 ######## Descriptive statistics #######
 
